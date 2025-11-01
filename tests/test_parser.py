@@ -1,13 +1,43 @@
 # tests/test_parser.py
+import pytest
+from src.lexer import Lexer
+from src.parser import Parser, VariableDeclarationNode, BinaryOpNode, NumberNode, CallNode
 
-import unittest
-from src.parser import парсить_код
+def test_parse_variable_declaration():
+    code = "переменная x = 10"
+    lexer = Lexer(code)
+    tokens = lexer.tokenize()
+    parser = Parser(tokens)
+    ast = parser.parse()
 
-class TestParser(unittest.TestCase):
-    def test_парсить_код(self):
-        код = "функция приветствие()"
-        self.assertEqual(парсить_код(код), "Парсинг: функция приветствие()")
+    stmt = ast.statements[0]
+    assert isinstance(stmt, VariableDeclarationNode)
+    assert stmt.identifier.value == 'x'
+    assert isinstance(stmt.value, NumberNode)
+    assert stmt.value.value == 10
 
-if __name__ == "__main__":
-    unittest.main()
+def test_parse_binary_operation():
+    code = "15 + 5"
+    lexer = Lexer(code)
+    tokens = lexer.tokenize()
+    parser = Parser(tokens)
+    ast = parser.parse()
 
+    expr = ast.statements[0]
+    assert isinstance(expr, BinaryOpNode)
+    assert expr.left.value == 15
+    assert expr.op.type == 'СЛОЖЕНИЕ'
+    assert expr.right.value == 5
+
+def test_parse_function_call():
+    code = "вывод(y)"
+    lexer = Lexer(code)
+    tokens = lexer.tokenize()
+    parser = Parser(tokens)
+    ast = parser.parse()
+
+    expr = ast.statements[0]
+    assert isinstance(expr, CallNode)
+    assert expr.callee.value == 'вывод'
+    assert len(expr.args) == 1
+    assert expr.args[0].value == 'y'
