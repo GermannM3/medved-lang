@@ -1,0 +1,176 @@
+# GitHub Actions для автоматического тестирования и демонстрации языка Медведь
+
+имя: Тесты и Демонстрация
+
+на:
+  пуш:
+    ветви: [ главная, мастер ]
+  тяга_запрос:
+    ветви: [ главная ]
+  расписание:
+    # Запускать каждый день в 12:00 UTC для демонстрации работы
+    - крон: '0 12 * * *'
+
+задания:
+  тесты:
+    имя: Запустить тесты
+    работает_на: ubuntu-latest
+    
+    шаги:
+    - использовать: actions/checkout@v3
+    
+    - имя: Настроить Python
+      использует: actions/setup-python@v4
+      с:
+        версия_питона: '3.9'
+    
+    - имя: Установить зависимости
+      запустить: |
+        python -m pip install --upgrade pip
+        если [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    
+    - имя: Запустить тесты парсера
+      запустить: |
+        python -m pytest tests/test_parser.py -v
+    
+    - имя: Запустить тесты лексера
+      запустить: |
+        python -m pytest tests/test_lexer.py -v
+    
+    - имя: Запустить примеры программ
+      запустить: |
+        echo "=== Тестирование примера: привет.мед ==="
+        python src/главный.py examples/привет.мед
+        
+        echo "=== Тестирование примера: калькулятор.мед ==="
+        python src/главный.py examples/калькулятор.мед
+        
+        echo "=== Тестирование примера: сервер.мед ==="
+        python src/главный.py examples/сервер.мед
+
+  демонстрация:
+    имя: Развернуть демо
+    работает_на: ubuntu-latest
+    потребности: тесты
+    
+    шаги:
+    - использовать: actions/checkout@v3
+    
+    - имя: Создать HTML отчет о работе
+      запустить: |
+        mkdir -p web/demo
+        
+        cat > web/demo/index.html << 'EOF'
+        <!DOCTYPE html>
+        <html lang="ru">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Медведь - Язык Программирования</title>
+            <style>
+                body {
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    max-width: 900px;
+                    margin: 0 auto;
+                    padding: 20px;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    min-height: 100vh;
+                }
+                .container {
+                    background: white;
+                    border-radius: 15px;
+                    padding: 30px;
+                    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+                }
+                h1 { color: #8B4513; text-align: center; }
+                .feature { 
+                    background: #f8f9fa; 
+                    padding: 20px; 
+                    margin: 15px 0; 
+                    border-radius: 8px;
+                    border-left: 4px solid #8B4513;
+                }
+                .code {
+                    background: #2d2d2d;
+                    color: #f8f8f2;
+                    padding: 15px;
+                    border-radius: 5px;
+                    overflow-x: auto;
+                    font-family: 'Courier New', monospace;
+                }
+                .status {
+                    text-align: center;
+                    padding: 10px;
+                    background: #d4edda;
+                    color: #155724;
+                    border-radius: 5px;
+                    margin: 20px 0;
+                }
+                .bear { font-size: 60px; text-align: center; display: block; margin: 20px 0; }
+                a { color: #667eea; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <span class="bear">🐻</span>
+                <h1>Язык программирования МЕДВЕДЬ</h1>
+                
+                <div class="status">
+                    ✅ Последняя сборка успешна! 
+                    <br>Дата: $(date '+%Y-%m-%d %H:%M:%S')
+                </div>
+                
+                <div class="feature">
+                    <h2>✨ Что это?</h2>
+                    <p><strong>Медведь</strong> — полноценный язык программирования, пишущийся исключительно на кириллице.</p>
+                    <p>Это не обёртка над Python — у него свой собственный интерпретатор, парсер и модель выполнения!</p>
+                </div>
+                
+                <div class="feature">
+                    <h2>🚀 Пример кода</h2>
+                    <div class="code">
+функция привет(имя):
+    вывод "Привет, " + имя + "!"
+
+для i от 1 до 5:
+    привет("Мир " + i)
+                    </div>
+                </div>
+                
+                <div class="feature">
+                    <h2>📁 Примеры программ</h2>
+                    <ul>
+                        <li><a href="examples/привет.мед" target="_blank">Привет, Мир!</a> — базовая программа</li>
+                        <li><a href="examples/калькулятор.мед" target="_blank">Калькулятор</a> — функции и рекурсия</li>
+                        <li><a href="examples/сервер.мед" target="_blank">Веб-сервер</a> — классы и HTTP</li>
+                    </ul>
+                </div>
+                
+                <div class="feature">
+                    <h2>🛠️ Как запустить</h2>
+                    <ol>
+                        <li>Склонируйте репозиторий</li>
+                        <li>Установите зависимости: <code>pip install -r requirements.txt</code></li>
+                        <li>Запустите программу: <code>python src/главный.py examples/привет.мед</code></li>
+                    </ol>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <p><a href="https://github.com/yourusername/medved">→ Перейти в репозиторий на GitHub</a></p>
+                </div>
+            </div>
+        </body>
+        </html>
+        EOF
+        
+        # Копируем примеры
+        cp examples/*.мед web/demo/examples/ 2>/dev/null || mkdir -p web/demo/examples && cp examples/*.мед web/demo/examples/
+        
+        echo "✅ Демо страница создана"
+    
+    - имя: Развернуть на GitHub Pages
+      использует: peaceiris/actions-gh-pages@v3
+      с:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./web/demo
+        publish_branch: gh-pages

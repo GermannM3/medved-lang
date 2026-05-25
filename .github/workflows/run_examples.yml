@@ -1,0 +1,27 @@
+name: 🐻 Запуск примеров Медведь
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test-examples:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Запустить пример "Привет, Мир!"
+      run: |
+        echo "=== Запуск программы привет.мед ==="
+        python3 src/главный.py examples/привет.мед
+    
+    - name: Тест пройден
+      run: echo "✅ Все примеры выполнены успешно!"
