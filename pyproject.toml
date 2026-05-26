@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "medved-lang"
+version = "1.0.0"
+description = "Cyrillic programming language - write code in Russian!"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+keywords = ["cyrillic", "russian", "programming language", "кириллица", "русский"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Interpreters",
+]
+requires-python = ">=3.8"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+]
+docs = [
+    "markdown>=3.4.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/medved"
+Documentation = "https://github.com/yourusername/medved/docs"
+Repository = "https://github.com/yourusername/medved.git"
+Issues = "https://github.com/yourusername/medved/issues"
+
+[project.scripts]
+medved = "src.main:main_cli"
+medved-pkg = "src.package_manager:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*", "lib*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.med", "*.json", "*.md"]
